@@ -36,74 +36,74 @@ namespace BlissRecruitmentAPI.Controllers
             if(filter != string.Empty)
             {
                 //Filter by question, image_url, thumb, choice and votes
-                filtered = from b in db.Questions.Include(Choice => Choice.choices)
+                filtered = from qt in db.Questions.Include(Choice => Choice.choices)
                            .Where(q => q.image_url.ToLower().Contains(filter) ||
                            q.question.ToLower().Contains(filter) ||
                            q.thumb_url.ToLower().Contains(filter) ||
-                           q.choices.Any(r => r.choice.Contains(filter)))
-                           select b;
+                           q.choices.Any(c => c.choice.Contains(filter)))
+                           select qt;
             }
             else
             {
                 //Not filtered
-                filtered = from b in db.Questions.Include(Choice => Choice.choices) select b;
+                filtered = from q in db.Questions.Include(Choice => Choice.choices) select q;
             }
 
             //Paging
             if (int.TryParse(limit, out _limit) && int.TryParse(offset, out _offset) && _limit >= 0 && _offset >= 0)
             {
                 //With limit and offset numeric and > 0
-                questions = from b in filtered.OrderBy(q => q.id).Skip(_offset).Take(_limit)
+                questions = from qt in filtered.OrderBy(q => q.id).Skip(_offset).Take(_limit)
                             select new QuestionDTO()
                             {
-                                id = b.id,
-                                question = b.question,
-                                image_url = b.image_url,
-                                thumb_url = b.thumb_url,
-                                published_at = b.published_at,
-                                choices = b.choices
+                                id = qt.id,
+                                question = qt.question,
+                                image_url = qt.image_url,
+                                thumb_url = qt.thumb_url,
+                                published_at = qt.published_at,
+                                choices = qt.choices
                             };
             }
             else if (int.TryParse(limit, out _limit) && _limit >= 0 && (!int.TryParse(offset, out _offset) || _offset < 0))
             {
                 //With only limit numeric && > 0
-                questions = from b in filtered.OrderBy(q => q.id).Take(_limit)
+                questions = from qt in filtered.OrderBy(q => q.id).Take(_limit)
                             select new QuestionDTO()
                             {
-                                id = b.id,
-                                question = b.question,
-                                image_url = b.image_url,
-                                thumb_url = b.thumb_url,
-                                published_at = b.published_at,
-                                choices = b.choices
+                                id = qt.id,
+                                question = qt.question,
+                                image_url = qt.image_url,
+                                thumb_url = qt.thumb_url,
+                                published_at = qt.published_at,
+                                choices = qt.choices
                             };
             }
             else if ((!int.TryParse(limit, out _limit) || _limit < 0) && int.TryParse(offset, out _offset) && _offset >= 0)
             {
                 //With only offset numeric && > 0
-                questions = from b in filtered.OrderBy(q => q.id).Skip(_offset)
+                questions = from qt in filtered.OrderBy(q => q.id).Skip(_offset)
                             select new QuestionDTO()
                             {
-                                id = b.id,
-                                question = b.question,
-                                image_url = b.image_url,
-                                thumb_url = b.thumb_url,
-                                published_at = b.published_at,
-                                choices = b.choices
+                                id = qt.id,
+                                question = qt.question,
+                                image_url = qt.image_url,
+                                thumb_url = qt.thumb_url,
+                                published_at = qt.published_at,
+                                choices = qt.choices
                             };
             }
             else
             {
                 //Else...
-                questions = from b in filtered.Include(Choice => Choice.choices)
+                questions = from qt in filtered.Include(Choice => Choice.choices)
                             select new QuestionDTO()
                             {
-                                id = b.id,
-                                question = b.question,
-                                image_url = b.image_url,
-                                thumb_url = b.thumb_url,
-                                published_at = b.published_at,
-                                choices = b.choices
+                                id = qt.id,
+                                question = qt.question,
+                                image_url = qt.image_url,
+                                thumb_url = qt.thumb_url,
+                                published_at = qt.published_at,
+                                choices = qt.choices
                             };
             }
 
@@ -116,16 +116,16 @@ namespace BlissRecruitmentAPI.Controllers
         [ResponseType(typeof(QuestionDTO))]
         public IHttpActionResult GetQuestion(int id)
         {
-            IQueryable<QuestionDTO> question = from b in db.Questions.Include(Choice => Choice.choices)
-                                            where b.id == id
+            IQueryable<QuestionDTO> question = from qt in db.Questions.Include(Choice => Choice.choices)
+                                            where qt.id == id
                                             select new QuestionDTO()
                                             {
-                                                id = b.id,
-                                                question = b.question,
-                                                image_url = b.image_url,
-                                                thumb_url = b.thumb_url,
-                                                published_at = b.published_at,
-                                                choices = b.choices
+                                                id = qt.id,
+                                                question = qt.question,
+                                                image_url = qt.image_url,
+                                                thumb_url = qt.thumb_url,
+                                                published_at = qt.published_at,
+                                                choices = qt.choices
                                             };
 
             if (question.ToList().Count == 0)
