@@ -191,6 +191,10 @@
     <Compile Include="Migrations\201901242345154_Initial.Designer.cs">
       <DependentUpon>201901242345154_Initial.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201901251606097_ChangedKeyColumn.cs" />
+    <Compile Include="Migrations\201901251606097_ChangedKeyColumn.Designer.cs">
+      <DependentUpon>201901251606097_ChangedKeyColumn.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Choice.cs" />
     <Compile Include="Models\Question.cs" />
@@ -284,6 +288,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201901242345154_Initial.resx">
       <DependentUpon>201901242345154_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201901251606097_ChangedKeyColumn.resx">
+      <DependentUpon>201901251606097_ChangedKeyColumn.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

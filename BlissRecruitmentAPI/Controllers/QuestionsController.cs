@@ -25,10 +25,11 @@ namespace BlissRecruitmentAPI.Controllers
         /// </remarks>
         /// <returns>IHttpActionResult typeof(QuestionDTO) -  Content Type Json</returns>
         // GET: api/questions
+        [Route("api/questions")]
         public IQueryable<QuestionDTO> Get([FromUri] string limit = "", [FromUri] string offset = "", [FromUri] string filter = "")
         {
-            IQueryable<Question> filtered;
-            IQueryable<QuestionDTO> questions = null;
+            IQueryable<Question> filteredQuestions;
+            IQueryable<QuestionDTO> questionsDTO = null;
             int _limit;
             int _offset;
 
@@ -36,7 +37,7 @@ namespace BlissRecruitmentAPI.Controllers
             if(filter != string.Empty)
             {
                 //Filter by question, image_url, thumb, choice and votes
-                filtered = from qt in db.Questions.Include(Choice => Choice.choices)
+                filteredQuestions = from qt in db.Questions.Include(Choice => Choice.choices)
                            .Where(q => q.image_url.ToLower().Contains(filter) ||
                            q.question.ToLower().Contains(filter) ||
                            q.thumb_url.ToLower().Contains(filter) ||
@@ -46,14 +47,14 @@ namespace BlissRecruitmentAPI.Controllers
             else
             {
                 //Not filtered
-                filtered = from q in db.Questions.Include(Choice => Choice.choices) select q;
+                filteredQuestions = from q in db.Questions.Include(Choice => Choice.choices) select q;
             }
 
             //Paging
             if (int.TryParse(limit, out _limit) && int.TryParse(offset, out _offset) && _limit >= 0 && _offset >= 0)
             {
                 //With limit and offset numeric and > 0
-                questions = from qt in filtered.OrderBy(q => q.id).Skip(_offset).Take(_limit)
+                questionsDTO = from qt in filteredQuestions.OrderBy(q => q.id).Skip(_offset).Take(_limit)
                             select new QuestionDTO()
                             {
                                 id = qt.id,
@@ -67,7 +68,7 @@ namespace BlissRecruitmentAPI.Controllers
             else if (int.TryParse(limit, out _limit) && _limit >= 0 && (!int.TryParse(offset, out _offset) || _offset < 0))
             {
                 //With only limit numeric && > 0
-                questions = from qt in filtered.OrderBy(q => q.id).Take(_limit)
+                questionsDTO = from qt in filteredQuestions.OrderBy(q => q.id).Take(_limit)
                             select new QuestionDTO()
                             {
                                 id = qt.id,
@@ -81,7 +82,7 @@ namespace BlissRecruitmentAPI.Controllers
             else if ((!int.TryParse(limit, out _limit) || _limit < 0) && int.TryParse(offset, out _offset) && _offset >= 0)
             {
                 //With only offset numeric && > 0
-                questions = from qt in filtered.OrderBy(q => q.id).Skip(_offset)
+                questionsDTO = from qt in filteredQuestions.OrderBy(q => q.id).Skip(_offset)
                             select new QuestionDTO()
                             {
                                 id = qt.id,
@@ -95,7 +96,7 @@ namespace BlissRecruitmentAPI.Controllers
             else
             {
                 //Else...
-                questions = from qt in filtered.Include(Choice => Choice.choices)
+                questionsDTO = from qt in filteredQuestions.Include(Choice => Choice.choices)
                             select new QuestionDTO()
                             {
                                 id = qt.id,
@@ -107,16 +108,22 @@ namespace BlissRecruitmentAPI.Controllers
                             };
             }
 
-            return questions;
+            return questionsDTO;
         }
 
-
+        /// <summary>
+        /// Gets a defined question
+        /// </summary>
+        /// <remarks>
+        /// api/questions/{id}
+        /// </remarks>
+        /// <returns>IHttpActionResult typeof(QuestionDTO) -  Content Type Json</returns>
         // GET: api/questions/5
-        [Route("api/questions/{id}")]
+        [Route("api/questions/{id}", Name = "GetQuestion")]
         [ResponseType(typeof(QuestionDTO))]
         public IHttpActionResult GetQuestion(int id)
         {
-            IQueryable<QuestionDTO> question = from qt in db.Questions.Include(Choice => Choice.choices)
+            IQueryable<QuestionDTO> questionsDTO = from qt in db.Questions.Include(Choice => Choice.choices)
                                             where qt.id == id
                                             select new QuestionDTO()
                                             {
@@ -128,15 +135,45 @@ namespace BlissRecruitmentAPI.Controllers
                                                 choices = qt.choices
                                             };
 
-            if (question.ToList().Count == 0)
+            if (questionsDTO.ToList().Count == 0)
             {
                 return NotFound();
             }
 
-            return Ok(question);
+            return Ok(questionsDTO);
+        }
+
+        /// <summary>
+        /// Adds a new question
+        /// </summary>
+        /// <remarks>
+        /// api/questions
+        /// </remarks>
+        /// <returns>IHttpActionResult typeof(QuestionDTO) -  Content Type Json</returns>
+        // POST: api/questions
+        [HttpPost]
+        [Route("api/questions")]
+        [ResponseType(typeof(QuestionDTO))]
+        public IHttpActionResult PostQuestion(PostQuestionDTO question)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            Question questionMapped = question.ToQuestionMap();
+
+            db.Questions.Add(questionMapped);
+            db.SaveChanges();
+
+            QuestionDTO responseQuestion = questionMapped.ConvertToQuestionDTO();
+
+            return CreatedAtRoute("GetQuestion", new { id = responseQuestion.id }, responseQuestion);
         }
 
         // PUT: api/Questions/5
+        [HttpPut]
+        [Route("api/questions/{id}")]
         [ResponseType(typeof(void))]
         public IHttpActionResult PutQuestion(int id, Question question)
         {
@@ -169,21 +206,6 @@ namespace BlissRecruitmentAPI.Controllers
             }
 
             return StatusCode(HttpStatusCode.NoContent);
-        }
-
-        // POST: api/Questions
-        [ResponseType(typeof(Question))]
-        public IHttpActionResult PostQuestion(Question question)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            db.Questions.Add(question);
-            db.SaveChanges();
-
-            return CreatedAtRoute("DefaultApi", new { id = question.id }, question);
         }
 
         // DELETE: api/Questions/5
