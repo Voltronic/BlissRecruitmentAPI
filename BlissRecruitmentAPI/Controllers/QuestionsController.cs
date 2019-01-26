@@ -10,7 +10,9 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Description;
+using BlissRecruitmentAPI.DTO;
 using BlissRecruitmentAPI.Models;
+using BlissRecruitmentAPI.Extensions;
 
 namespace BlissRecruitmentAPI.Controllers
 {
@@ -140,7 +142,10 @@ namespace BlissRecruitmentAPI.Controllers
             //Checking if there is some question
             if (questionsDTO.ToList().Count == 0)
             {
-                return NotFound();
+                var result = new ResultDTO();
+                result.status = "Not Found. Question not found";
+
+                return Content(HttpStatusCode.NotFound, result);
             }
 
             return Ok(questionsDTO);
@@ -162,7 +167,10 @@ namespace BlissRecruitmentAPI.Controllers
             //Validates model state
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                var result = new ResultDTO();
+                result.status = "Bad Request. All fields are mandatory";
+
+                return Content(HttpStatusCode.BadRequest, result);
             }
 
             //Map the DTO to Object
@@ -175,7 +183,7 @@ namespace BlissRecruitmentAPI.Controllers
             //Maps the Object to DTO for response
             QuestionDTO responseQuestion = questionMapped.ConvertToQuestionDTO();
 
-            return CreatedAtRoute("GetQuestion", new { id = responseQuestion.id }, responseQuestion);
+            return CreatedAtRoute("GetQuestion", new { question_id = responseQuestion.id }, responseQuestion);
         }
 
         /// <summary>
@@ -197,13 +205,19 @@ namespace BlissRecruitmentAPI.Controllers
             //Validates model state
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                var result = new ResultDTO();
+                result.status = "Bad Request. All fields are mandatory";
+
+                return Content(HttpStatusCode.BadRequest, result);
             }
 
             //Check if the question_id matches the DTO id
             if (question_id != question.id)
             {
-                return BadRequest();
+                var result = new ResultDTO();
+                result.status = "Bad Request. Parameters not match";
+
+                return Content(HttpStatusCode.BadRequest, result);
             }
 
             //Attaches the object to update and changes the state to modified...
@@ -228,7 +242,10 @@ namespace BlissRecruitmentAPI.Controllers
             {
                 if (!QuestionExists(question_id))
                 {
-                    return NotFound();
+                    var result = new ResultDTO();
+                    result.status = "Not Found. Question not found";
+
+                    return Content(HttpStatusCode.NotFound, result);
                 }
                 else
                 {

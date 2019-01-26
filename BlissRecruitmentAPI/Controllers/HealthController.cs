@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using BlissRecruitmentAPI.DTO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -18,13 +19,13 @@ namespace BlissRecruitmentAPI.Controllers
         /// api/health/[get]
         /// </remarks>
         /// <returns>IHttpActionResult typeof(ServerHealth) -  Content Type Json</returns>
-        [ResponseType(typeof(ServerHealth))]
+        [ResponseType(typeof(ResultDTO))]
         public IHttpActionResult Get()
         {
-            var health = new ServerHealth();
-            health.status = HttpStatusCode.OK.ToString();
+            var result = new ResultDTO();
+            result.status = HttpStatusCode.OK.ToString();
 
-            return Ok(health);
+            return Ok(result);
         }
     }
 }

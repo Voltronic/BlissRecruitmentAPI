@@ -24,34 +24,4 @@ namespace BlissRecruitmentAPI.Models
         [JsonIgnore]
         public virtual Question question { get; set; }
     }
-
-    public class ChoiceDTO
-    {
-        public string choice { get; set; }
-    }
-
-    public static class ChoiceUtils
-    {
-        public static Choice ConvertToChoice(this ChoiceDTO choice)
-        {
-            return new Choice { choice = choice.choice, votes = 0 };
-        }
-
-        public static ICollection<Choice> ToChoiceMap(ICollection<ChoiceDTO> choices)
-        {
-            return choices.Select(choice => choice.ConvertToChoice()).ToList();
-
-        }
-
-        public static Choice ConvertToUpdateChoice(this Choice choice, int id)
-        {
-            return new Choice { questionId = id, choice = choice.choice, votes = choice.votes };
-        }
-
-        public static ICollection<Choice> ToChoiceUpdateMap(ICollection<Choice> choices, int id)
-        {
-            return choices.Select(choice => choice.ConvertToUpdateChoice(id)).ToList();
-
-        }
-    }
 }

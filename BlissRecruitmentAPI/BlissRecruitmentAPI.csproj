@@ -184,9 +184,12 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\HealthController.cs" />
     <Compile Include="Controllers\QuestionsController.cs" />
+    <Compile Include="Controllers\ShareController.cs" />
+    <Compile Include="DTO\DTO.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Mail\MailSender.cs" />
     <Compile Include="Migrations\201901260027292_Initial.cs" />
     <Compile Include="Migrations\201901260027292_Initial.Designer.cs">
       <DependentUpon>201901260027292_Initial.cs</DependentUpon>
@@ -197,6 +200,7 @@
     <Compile Include="Models\QuestionChoicesContext.cs" />
     <Compile Include="Models\ServerHealth.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Extensions\Extensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />
