@@ -79,5 +79,18 @@ namespace BlissRecruitmentAPI.Models
                 choices = question.choices
             };
         }
+
+        public static Question ConvertToQuestion(this QuestionDTO question, int id)
+        {
+            return new Question
+            {
+                id = question.id,
+                question = question.question,
+                image_url = question.image_url,
+                thumb_url = question.thumb_url,
+                published_at = question.published_at,
+                choices = ChoiceUtils.ToChoiceUpdateMap(question.choices, id)
+            };
+        }
     }
 }

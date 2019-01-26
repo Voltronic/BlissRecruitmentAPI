@@ -13,7 +13,7 @@ namespace BlissRecruitmentAPI.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201901242345154_Initial"; }
+            get { return "201901260027292_Initial"; }
         }
         
         string IMigrationMetadata.Source

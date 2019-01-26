@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
+using System.Data.Entity.Migrations;
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -115,17 +116,18 @@ namespace BlissRecruitmentAPI.Controllers
         /// Gets a defined question
         /// </summary>
         /// <remarks>
-        /// api/questions/{id}
+        /// api/questions/{question_id}
         /// </remarks>
         /// <returns>IHttpActionResult typeof(QuestionDTO) -  Content Type Json</returns>
         // GET: api/questions/5
-        [Route("api/questions/{id}", Name = "GetQuestion")]
+        [Route("api/questions/{question_id}", Name = "GetQuestion")]
         [ResponseType(typeof(QuestionDTO))]
-        public IHttpActionResult GetQuestion(int id)
+        public IHttpActionResult GetQuestion(int question_id)
         {
+            //Gets question from context and eager loads navigation properties
             IQueryable<QuestionDTO> questionsDTO = from qt in db.Questions.Include(Choice => Choice.choices)
-                                            where qt.id == id
-                                            select new QuestionDTO()
+                                            where qt.id == question_id
+                                                   select new QuestionDTO()
                                             {
                                                 id = qt.id,
                                                 question = qt.question,
@@ -135,6 +137,7 @@ namespace BlissRecruitmentAPI.Controllers
                                                 choices = qt.choices
                                             };
 
+            //Checking if there is some question
             if (questionsDTO.ToList().Count == 0)
             {
                 return NotFound();
@@ -156,46 +159,74 @@ namespace BlissRecruitmentAPI.Controllers
         [ResponseType(typeof(QuestionDTO))]
         public IHttpActionResult PostQuestion(PostQuestionDTO question)
         {
+            //Validates model state
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
+            //Map the DTO to Object
             Question questionMapped = question.ToQuestionMap();
 
-            db.Questions.Add(questionMapped);
+            //Adds or updates the database
+            db.Questions.AddOrUpdate(questionMapped);
             db.SaveChanges();
 
+            //Maps the Object to DTO for response
             QuestionDTO responseQuestion = questionMapped.ConvertToQuestionDTO();
 
             return CreatedAtRoute("GetQuestion", new { id = responseQuestion.id }, responseQuestion);
         }
 
+        /// <summary>
+        /// Updates a new question
+        /// </summary>
+        /// <remarks>
+        /// api/questions/{question_id}
+        /// </remarks>
+        /// <returns>IHttpActionResult typeof(QuestionDTO) -  Content Type Json</returns>
         // PUT: api/Questions/5
         [HttpPut]
-        [Route("api/questions/{id}")]
-        [ResponseType(typeof(void))]
-        public IHttpActionResult PutQuestion(int id, Question question)
+        [Route("api/questions/{question_id}")]
+        [ResponseType(typeof(QuestionDTO))]
+        public IHttpActionResult PutQuestion(int question_id, QuestionDTO question)
         {
+            //Map the DTO to Object
+            Question _question = question.ConvertToQuestion(question_id);
+
+            //Validates model state
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (id != question.id)
+            //Check if the question_id matches the DTO id
+            if (question_id != question.id)
             {
                 return BadRequest();
             }
 
-            db.Entry(question).State = EntityState.Modified;
+            //Attaches the object to update and changes the state to modified...
+            db.Questions.Attach(_question);
+
+            var entry = db.Entry(_question);
+            entry.State = EntityState.Modified;
+
+            //including navigation properties
+            foreach (var navigationProperty in _question.choices)
+            {
+                var entityEntry = db.Entry(navigationProperty);
+                entityEntry.State = EntityState.Modified;
+            }
 
             try
             {
+                //Saves on the database
                 db.SaveChanges();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!QuestionExists(id))
+                if (!QuestionExists(question_id))
                 {
                     return NotFound();
                 }
@@ -205,24 +236,27 @@ namespace BlissRecruitmentAPI.Controllers
                 }
             }
 
-            return StatusCode(HttpStatusCode.NoContent);
+            //Maps the Object to DTO for response
+            QuestionDTO responseQuestion = _question.ConvertToQuestionDTO();
+
+            return CreatedAtRoute("GetQuestion", new { id = responseQuestion.id }, responseQuestion);
         }
 
-        // DELETE: api/Questions/5
-        [ResponseType(typeof(Question))]
-        public IHttpActionResult DeleteQuestion(int id)
-        {
-            Question question = db.Questions.Find(id);
-            if (question == null)
-            {
-                return NotFound();
-            }
+        //// DELETE: api/Questions/5
+        //[ResponseType(typeof(Question))]
+        //public IHttpActionResult DeleteQuestion(int id)
+        //{
+        //    Question question = db.Questions.Find(id);
+        //    if (question == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            db.Questions.Remove(question);
-            db.SaveChanges();
+        //    db.Questions.Remove(question);
+        //    db.SaveChanges();
 
-            return Ok(question);
-        }
+        //    return Ok(question);
+        //}
 
         protected override void Dispose(bool disposing)
         {

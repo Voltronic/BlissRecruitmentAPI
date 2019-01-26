@@ -23,20 +23,20 @@ namespace BlissRecruitmentAPI.Migrations
                 "dbo.Choices",
                 c => new
                     {
+                        questionId = c.Int(nullable: false),
                         choice = c.String(nullable: false, maxLength: 128),
                         votes = c.Int(nullable: false),
-                        Question_id = c.Int(),
                     })
-                .PrimaryKey(t => t.choice)
-                .ForeignKey("dbo.Questions", t => t.Question_id)
-                .Index(t => t.Question_id);
+                .PrimaryKey(t => new { t.questionId, t.choice })
+                .ForeignKey("dbo.Questions", t => t.questionId, cascadeDelete: true)
+                .Index(t => t.questionId);
             
         }
         
         public override void Down()
         {
-            DropForeignKey("dbo.Choices", "Question_id", "dbo.Questions");
-            DropIndex("dbo.Choices", new[] { "Question_id" });
+            DropForeignKey("dbo.Choices", "questionId", "dbo.Questions");
+            DropIndex("dbo.Choices", new[] { "questionId" });
             DropTable("dbo.Choices");
             DropTable("dbo.Questions");
         }

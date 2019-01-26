@@ -29,25 +29,10 @@ namespace BlissRecruitmentAPI.Migrations
                 published_at = DateTime.Now,
                 choices = new List<Choice>
                 {
-                    new Choice() { choice = "Swift", votes = 0 },
-                    new Choice() { choice = "Python", votes = 0 },
-                    new Choice() { choice = "Objective-C", votes = 0 },
-                    new Choice() { choice = "Ruby", votes = 0 }
-                }
-            });
-
-            context.Questions.AddOrUpdate(new Question()
-            {
-                question = "What is your favourite song?",
-                image_url = "https://dummyimage.com/600x400/000/fff.png&text=question+1+image+(600x400)",
-                thumb_url = "https://dummyimage.com/120x120/000/fff.png&text=question+1+image+(120x120)",
-                published_at = DateTime.Now,
-                choices = new List<Choice>
-                {
-                    new Choice() { choice = "Uooou", votes = 0 },
-                    new Choice() { choice = "Nice!", votes = 0 },
-                    new Choice() { choice = "Yep", votes = 0 },
-                    new Choice() { choice = "Anywhere", votes = 0 }
+                    new Choice() { choice = "Swift", votes = 2048 },
+                    new Choice() { choice = "Python", votes = 1024 },
+                    new Choice() { choice = "Objective-C", votes = 512 },
+                    new Choice() { choice = "Ruby", votes = 256 }
                 }
             });
         }
