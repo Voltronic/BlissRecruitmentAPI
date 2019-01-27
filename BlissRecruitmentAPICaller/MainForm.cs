@@ -142,7 +142,7 @@ namespace BlissRecruitmentAPICaller
                 builder.Query = query.ToString();
                 string url = builder.ToString();
 
-                HttpContent content;
+                StringContent content = new StringContent("");
                 HttpResponseMessage response = await client.PostAsync(url, content);
                 txtResult.Text = await response.Content.ReadAsStringAsync();
             }
