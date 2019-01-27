@@ -34,14 +34,14 @@ namespace BlissRecruitmentAPI.Controllers
                 return Content(HttpStatusCode.BadRequest, result);
             }
 
-            Task<bool> task = Task.Factory.StartNew(() =>
+            Task<string> task = Task.Factory.StartNew(() =>
             {
                 return MailSender.SendEmail(destination_email, content_url);
             });
 
-            if(!task.Result)
+            if(task.Result != "OK")
             {
-                result.status = "Internal Server Error. Email not sent";
+                result.status = "Internal Server Error. " + task.Result;
 
                 return Content(HttpStatusCode.InternalServerError, result);
             }

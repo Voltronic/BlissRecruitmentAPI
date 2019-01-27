@@ -1,33 +1,29 @@
-﻿using BlissRecruitmentAPI.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Net.Mail;
-using System.Threading.Tasks;
-using System.Web;
+using System.Configuration;
 
 namespace BlissRecruitmentAPI.Mail
 {
     public static class MailSender
     {
-        public static bool SendEmail(string destination_email, string content_url)
+        public static string SendEmail(string destination_email, string content_url)
         {
             try
             {
                 string htmlBody = content_url;
 
-                SmtpClient SmtpServer = new SmtpClient("smtp.gmail.com")
+                SmtpClient SmtpServer = new SmtpClient(ConfigurationManager.AppSettings["MailHost"])
                 {
                     Port = 587,
                     UseDefaultCredentials = false,
-                    Credentials = new System.Net.NetworkCredential("mydjenerg@gmail.com", "Pa$$w0rd#Gmail"),
+                    Credentials = new System.Net.NetworkCredential(ConfigurationManager.AppSettings["MailUser"], ConfigurationManager.AppSettings["MailPass"]),
                     EnableSsl = true
                 };
 
                 var mail = new MailMessage()
                 {
-                    From = new MailAddress("mydjenerg@gmail.com"),
-                    Subject = "BlissRecruitmentAPI - Sharing with you...",
+                    From = new MailAddress(ConfigurationManager.AppSettings["MailSender"]),
+                    Subject = ConfigurationManager.AppSettings["MailSubject"],
                     IsBodyHtml = true
                 };
 
@@ -36,9 +32,9 @@ namespace BlissRecruitmentAPI.Mail
 
                 SmtpServer.Send(mail);
 
-                return true;
+                return "OK";
             }
-            catch (Exception) { return false; }
+            catch (Exception ex) { return ex.Message; }
         }
 
         public static bool IsValidEmail(string email)
