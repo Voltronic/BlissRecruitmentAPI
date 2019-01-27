@@ -21,6 +21,7 @@ namespace BlissRecruitmentAPI.Controllers
         /// api/share/[get]
         /// </remarks>
         /// <returns>IHttpActionResult typeof(ShareResult) -  Content Type Json</returns>
+        [HttpPost]
         [Route("api/share")]
         [ResponseType(typeof(ResultDTO))]
         public IHttpActionResult Get([FromUri] string destination_email, [FromUri] string content_url)
