@@ -29,7 +29,7 @@ This web API will run over a url like http://[host][port]/api as a base address.
 #### NOTE: Because it is a demo web API, when configuring an smtp server like gmail or hotmail, you will need additional steps to allow this application to send email for security purposes. This steps depends on your stmp mail distributor
 
 ### Swagger
-The BlissRecruitmentAPI is integrated with swagger, to access swagger, use the base API url followed by /swagger (example: http://localhost/api/swagger)
+The BlissRecruitmentAPI is integrated with swagger, to access swagger, use the base API url followed by /swagger (example: http://localhost/BlissRecruitmentAPI/api/swagger)
 
 ### BlissRecruitmentAPICaller
 This API is also delivered with a windows forms project named BlissRecruitmentAPICaller that consumes the endpoints of the API, to run this project, build the project and run it or, after building the project, run the generated file BlissRecruitmentAPICaller.exe
