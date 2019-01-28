@@ -1,7 +1,7 @@
 # BlissRecruitmentAPI
 This project was done for recruitment purposes. This web API BlissRecruitmentAPI implements the specification present in the url https://blissrecruitmentapi.docs.apiary.io/.
 
-This web API will run over a url like http://[host][port]/api as a base address.
+This web API will run over a url like http://[host][port]/BlissRecruitmentAPI/api as a base address.
 
 ## Getting Started
 
